@@ -274,8 +274,8 @@
 	  	$payscout_api_password = 'scout123!';
 	  	$payscout_api_token = 'dd59e50945c2f2153ebf2559bc3fb4c5';	  
 	  }
-
-
+		
+		
 
       $params = array('client_username' => $payscout_api_user_name,
                       'client_password' => $payscout_api_password,
@@ -305,11 +305,11 @@
 
                       'billing_state' => html_entity_decode(substr($order->billing['state'], 0, 40), ENT_QUOTES, 'UTF-8'),
 
-                      'billing_postal_code' => html_entity_decode(substr($order->billing['postcode'], 0, 20), ENT_QUOTES, 'UTF-8'),
+                      'billing_postal_code' => html_entity_decode(substr($order->billing['postcode'], 0, 16), ENT_QUOTES, 'UTF-8'),
 
-                      'billing_country' => html_entity_decode(substr($order->billing['country']['title'], 0, 60), ENT_QUOTES, 'UTF-8'),
+                      'billing_country' => html_entity_decode($order->billing['country']['iso_code_3'], ENT_QUOTES, 'UTF-8'),
 
-                      'billing_phone_number' => substr($order->customer['telephone'], 0, 25),
+                      'billing_phone_number' => substr($order->customer['telephone'], 0, 15),
 
                       'billing_email_address' => substr($order->customer['email_address'], 0, 255)
 
@@ -329,9 +329,9 @@
 
         $params['shipping_state'] = substr($order->delivery['state'], 0, 40);
 
-        $params['shipping_postal_code'] = substr($order->delivery['postcode'], 0, 20);
+        $params['shipping_postal_code'] = substr($order->delivery['postcode'], 0, 15);
 
-        $params['shipping_country'] = substr($order->delivery['country']['title'], 0, 60);
+        $params['shipping_country'] = $order->delivery['country']['iso_code_3'];
 
       }
 
@@ -379,13 +379,12 @@
       	$error = false;
 		
 		
-
      	if(isset($response->status) &&  $response->status == 'approved') { 
             $order->info['order_status'] = MODULE_PAYMENT_PAYSCOUT_REVIEW_ORDER_STATUS_ID;          
 
       } elseif (isset($response->status) &&  $response->status != 'approved' ) {
 
-		 $error_message =  base64_encode($response['raw_message']);
+		 $error_message =  base64_encode($response->raw_message);
 
 		 if(isset($response->message) && $response->message!="")
 		 {
@@ -746,7 +745,6 @@
                                                                          'use_func' => 'tep_get_zone_class_title'),
 
                       'MODULE_PAYMENT_PAYSCOUT_TRANSACTION_SERVER' => array('title' => 'Transaction Server',
-
 
                                                                                        'desc' => 'Perform transactions on the live or test server. The test server should only be used by developers with payscout test accounts.',
 
